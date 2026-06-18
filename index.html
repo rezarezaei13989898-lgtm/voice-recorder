@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="fa">
 <head>
@@ -11,11 +12,14 @@
 <h2>ضبط صدا</h2>
 
 <button id="startBtn">🎤 شروع ضبط</button>
-<button id="stopBtn" disabled>⏹ توقف ضبط</button>
+<button id="stopBtn" disabled>⏹ توقف و ارسال</button>
 
 <p id="status">آماده</p>
 
 <script>
+
+const SCRIPT_URL =
+"https://script.google.com/macros/s/AKfycbwYifAqF2gmusHXWseK48zzQLdh5iv1fq9RRbCvJXP0ZafQLtHiIWK0GMLaKmkfXXRC/exec";
 
 let recorder;
 let chunks = [];
@@ -24,10 +28,9 @@ document.getElementById("startBtn").onclick = async () => {
 
   try {
 
-    const stream =
-      await navigator.mediaDevices.getUserMedia({
-        audio: true
-      });
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio:true
+    });
 
     chunks = [];
 
@@ -37,50 +40,19 @@ document.getElementById("startBtn").onclick = async () => {
       chunks.push(e.data);
     };
 
-    recorder.onstop = () => {
-
-      const blob =
-        new Blob(chunks,{type:'audio/webm'});
-
-      const url =
-        URL.createObjectURL(blob);
-
-      const a =
-        document.createElement('a');
-
-      a.href = url;
-      a.download = 'voice.webm';
-
-      a.textContent =
-        '📥 دانلود فایل ضبط شده';
-
-      document.body.appendChild(
-        document.createElement('br')
-      );
-
-      document.body.appendChild(a);
-
-      document.getElementById("status")
-        .innerText = "ضبط کامل شد";
-    };
-
     recorder.start();
 
-    document.getElementById("status")
-      .innerText = "در حال ضبط...";
+    document.getElementById("status").innerText =
+      "در حال ضبط...";
 
-    document.getElementById("startBtn")
-      .disabled = true;
-
-    document.getElementById("stopBtn")
-      .disabled = false;
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
 
   }
-
   catch(err){
 
-    document.getElementById("status")
-      .innerText = err;
+    document.getElementById("status").innerText =
+      err;
 
   }
 
@@ -90,11 +62,32 @@ document.getElementById("stopBtn").onclick = () => {
 
   recorder.stop();
 
-  document.getElementById("startBtn")
-    .disabled = false;
+  recorder.onstop = async () => {
 
-  document.getElementById("stopBtn")
-    .disabled = true;
+    document.getElementById("status").innerText =
+      "در حال آماده سازی...";
+
+    const blob =
+      new Blob(chunks,{type:'audio/webm'});
+
+    const reader =
+      new FileReader();
+
+    reader.onloadend = async () => {
+
+      const base64 =
+        reader.result.split(',')[1];
+
+      document.getElementById("status").innerText =
+        "فایل آماده شد";
+
+      console.log(base64.length);
+
+    };
+
+    reader.readAsDataURL(blob);
+
+  };
 
 };
 
@@ -102,3 +95,5 @@ document.getElementById("stopBtn").onclick = () => {
 
 </body>
 </html>
+```
+
