@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="fa">
 <head>
@@ -24,17 +23,20 @@ const SCRIPT_URL =
 let recorder;
 let chunks = [];
 
-document.getElementById("startBtn").onclick = async () => {
+document.getElementById("startBtn").onclick =
+async () => {
 
   try {
 
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio:true
-    });
+    const stream =
+      await navigator.mediaDevices.getUserMedia({
+        audio:true
+      });
 
     chunks = [];
 
-    recorder = new MediaRecorder(stream);
+    recorder =
+      new MediaRecorder(stream);
 
     recorder.ondataavailable = e => {
       chunks.push(e.data);
@@ -49,6 +51,7 @@ document.getElementById("startBtn").onclick = async () => {
     stopBtn.disabled = false;
 
   }
+
   catch(err){
 
     document.getElementById("status").innerText =
@@ -58,7 +61,8 @@ document.getElementById("startBtn").onclick = async () => {
 
 };
 
-document.getElementById("stopBtn").onclick = () => {
+document.getElementById("stopBtn").onclick =
+() => {
 
   recorder.stop();
 
@@ -68,7 +72,10 @@ document.getElementById("stopBtn").onclick = () => {
       "در حال آماده سازی...";
 
     const blob =
-      new Blob(chunks,{type:'audio/webm'});
+      new Blob(
+        chunks,
+        {type:'audio/webm'}
+      );
 
     const reader =
       new FileReader();
@@ -79,9 +86,28 @@ document.getElementById("stopBtn").onclick = () => {
         reader.result.split(',')[1];
 
       document.getElementById("status").innerText =
-        "فایل آماده شد";
+        "در حال ارسال...";
 
-      console.log(base64.length);
+      const response =
+        await fetch(
+          SCRIPT_URL,
+          {
+            method:"POST",
+            body:JSON.stringify({
+              fileName:
+                "voice_" +
+                Date.now() +
+                ".webm",
+              base64Data:base64
+            })
+          }
+        );
+
+      const result =
+        await response.text();
+
+      document.getElementById("status").innerText =
+        result;
 
     };
 
@@ -95,5 +121,3 @@ document.getElementById("stopBtn").onclick = () => {
 
 </body>
 </html>
-```
-
